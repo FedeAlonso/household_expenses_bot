@@ -1,0 +1,20 @@
+{
+    "allowed_users": [183302873],
+    "db_path": "_output/household_expenses.db",
+    "texts": {
+        "user_not_allowed": "Sorry but your user is not allowed to use this bot",
+        "main_type_buttons_text": ["ALIMENTACION"],
+        "others_button_text": "OTHERS",
+        "generate_report_button_text": "CREATE REPORT",
+        "cancel_button_text": "CANCEL",
+        "yes_button_text": "YES",
+        "no_button_text": "NO",
+        "restart_text": "In order to restart the process type /start",
+        "start_new_expense": "Which type of expense do you want to add",
+        "receive_expense_type_message": "Expense Type: {expense_type}\nAdd a description (e.g.: store name)",
+        "receive_expense_description_message": "Expense Description: {expense_description}.\nAdd the expense amount",
+        "receive_expense_amount_message": "Expense Type: {expense_type}\nExpense Description: {expense_description}\nExpense Amount: {expense_amount}\nIs it correct?",
+        "receive_finish_gathering_info_message": "The following information has been inserted in the database\n"
+
+    }
+}
