@@ -16,5 +16,12 @@
         "receive_expense_amount_message": "Expense Type: {expense_type}\nExpense Description: {expense_description}\nExpense Amount: {expense_amount}\nIs it correct?",
         "receive_finish_gathering_info_message": "The following information has been inserted in the database\n"
 
+    },
+    "gdrive": {
+        "active": true,
+        "credentials_file": "conf/gdrive_credentials.json",
+        "sheet_name": "household_expenses",
+        "share_mails": ["fede488@gmail.com", "celia.moya88@gmail.com"],
+        "write_request_quota": 60
     }
 }

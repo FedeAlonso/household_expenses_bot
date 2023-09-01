@@ -90,6 +90,7 @@ async def receive_expense_type(update: Update, context: ContextTypes.DEFAULT_TYP
         message += config.get("texts").get("receive_expense_type_message").format(expense_type=expense_type)
     # Generate report
     elif config.get("texts").get("generate_report_button_text") in update.message.text:
+        # TODO:  GENERATE REPORT
         pass
     # Restart
     else:
@@ -169,6 +170,11 @@ async def receive_finish_gathering_info(update: Update, context: ContextTypes.DE
         
         insert_in_db(expense_info, config.get('db_path'))
         print_table_content(config.get('db_path'))
+        # TODO: GDRIVE?
+        # https://towardsdatascience.com/turn-google-sheets-into-your-own-database-with-python-4aa0b4360ce7
+        if config.get("gdrive").get("active"):
+            pass
+
     else:
         logger.info("User %s SAID NO WHEN GATHERING INFO", user.first_name)
 

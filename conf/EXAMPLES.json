@@ -1,0 +1,404 @@
+[
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "HIPOTECA",
+        "amount": 1020
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "COMUNIDAD",
+        "amount": 321
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "LUZ",
+        "amount": 66
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "TELEFONOS",
+        "amount": 66
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "SEGUROS VIDA",
+        "amount": 332
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "PAÑALES",
+        "amount": 70
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "MATRONATACION",
+        "amount": 53
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "YOLI",
+        "amount": 145
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "HIPERCOR",
+        "amount": 42
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "DIA",
+        "amount": 12
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "DIA Y FRUTA",
+        "amount": 25
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "FRUTA Y LEVADURA MADRE",
+        "amount": 1020
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "DIA",
+        "amount": 7
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "SPRAY NASAL CLARA",
+        "amount": 25
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "PLAFON CLARA",
+        "amount": 35
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "PLAFONES SALON",
+        "amount": 122
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "MUEBLES CLARA",
+        "amount": 220
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "SERVICIO TECNICO LAVADORA",
+        "amount": 50
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "REAGALO JOSE MORGADO",
+        "amount": 25
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "ROSCON",
+        "amount": 30
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "ESTANTERIA",
+        "amount": 140
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 92.76
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "DIA",
+        "amount": 19.70
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "VIPS",
+        "amount": 30
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 88.62
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "LIDL",
+        "amount": 21.07
+    },
+    {
+        "date": "20230101",
+        "type": "OTROS",
+        "description": "PLAFONES SALON 2",
+        "amount": 305
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 80
+    },
+    {
+        "date": "20230101",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 102.61
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "HIPOTECA",
+        "amount": 1021
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "COMUNIDAD",
+        "amount": 177
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "LUZ",
+        "amount": 63
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "TELEFONOS",
+        "amount": 92
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "PAÑALES",
+        "amount": 70
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "YOLI",
+        "amount": 72
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "FRUTA",
+        "amount": 8
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "PESCADO",
+        "amount": 40
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "ALDI",
+        "amount": 35
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "LIDL",
+        "amount": 22.40
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "PESCADO",
+        "amount": 10
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "FRUTA",
+        "amount": 12
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "LA REAL",
+        "amount": 17
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "MANOLITOS",
+        "amount": 6
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "UDACO",
+        "amount": 8
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "LEVADURA MADRE",
+        "amount": 5
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 116
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 33.96
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "MDM",
+        "amount": 575
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "CHINO",
+        "amount": 6.58
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "CASA VIEJA",
+        "amount": 80
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "EUREKA KIDS",
+        "amount": 9
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "TARTA",
+        "amount": 25
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 4.60
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 57.79
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "VENECIA",
+        "amount": 5
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "OPENCOR",
+        "amount": 12
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "FOTOS CLARA",
+        "amount": 8
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "TARTA Y TRICANTINAS",
+        "amount": 30
+    },
+    {
+        "date": "20230201",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 123.89
+    },
+    {
+        "date": "20230201",
+        "type": "OTROS",
+        "description": "REGALO DESI Y JOSE",
+        "amount": 300
+    },
+    {
+        "date": "20230301",
+        "type": "OTROS",
+        "description": "HIPOTECA",
+        "amount": 1020
+    },
+    {
+        "date": "20230301",
+        "type": "OTROS",
+        "description": "COMUNIDAD",
+        "amount": 177
+    },
+    {
+        "date": "20230301",
+        "type": "OTROS",
+        "description": "FOTOS",
+        "amount": 11.30
+    },
+    {
+        "date": "20230301",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 109
+    },
+    {
+        "date": "20230301",
+        "type": "ALIMENTACION",
+        "description": "LIDL",
+        "amount": 30
+    },
+    {
+        "date": "20230301",
+        "type": "ALIMENTACION",
+        "description": "CARREFOUR",
+        "amount": 35
+    },
+    {
+        "date": "20230301",
+        "type": "OTROS",
+        "description": "ESTANCO",
+        "amount": 15
+    }
+]
