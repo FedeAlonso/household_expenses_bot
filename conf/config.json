@@ -1,9 +1,11 @@
 {
+    "output_folder": "_output",
+    "log_filename": "household_expenses.log",
+    "db_filename": "household_expenses.db",
     "allowed_users": [183302873],
-    "db_path": "_output/household_expenses.db",
     "texts": {
-        "user_not_allowed": "Sorry but your user is not allowed to use this bot",
-        "main_type_buttons_text": ["ALIMENTACION"],
+        "user_not_allowed": "Sorry but you are not allowed to use this bot.\nPlease contact the admin.",
+        "main_type_buttons_text": ["ALIMENTACION", "CASA FIJOS", "OTROS", "YOLI"],
         "others_button_text": "OTHERS",
         "generate_report_button_text": "CREATE REPORT",
         "cancel_button_text": "CANCEL",

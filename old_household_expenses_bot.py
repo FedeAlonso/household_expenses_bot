@@ -1,9 +1,8 @@
 import logging
-from logging.handlers import RotatingFileHandler
 import os
 import json
 from datetime import date
-from utils.household_expenses_db import create_db_if_not_exist, create_table_if_not_exists, insert_in_db, get_table_content
+from utils.household_expenses_db import create_db_if_not_exist, create_table_if_not_exists, insert_in_db, print_table_content
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -16,97 +15,87 @@ from telegram.ext import (
 )
 
 
-# Load config
-CONFIG_FILE = "conf/config.json"
-with open(CONFIG_FILE) as f:
-    CONFIG = json.loads(f.read())
-
-if not os.path.exists(CONFIG.get("output_folder")):
-    os.makedirs(CONFIG.get("output_folder"))    
-
-DB_PATH = os.path.join(CONFIG.get("output_folder"), CONFIG.get("db_filename"))    
-
-
 # Enable logging
 logging.basicConfig(
-    handlers=[RotatingFileHandler(
-                os.path.join(CONFIG.get("output_folder"), CONFIG.get("log_filename")), 
-                maxBytes=20000000, 
-                backupCount=1000)],
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-
+CONFIG_FILE = "conf/config.json"
 NOT_ALLOWED_USER, EXPENSE_TYPE, EXPENSE_DESCRIPTION, EXPENSE_AMOUNT, FINISH_GATHERING_INFO = range(5)
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
     Entry point
     """
-    user = update.effective_user
-    context.user_data["user"] = user
-    if user['id'] not in CONFIG.get("allowed_users", []):
-        logger.info(f"Not Allowed user: '{user['first_name']}' with username '{user['username']}' and id '{user['id']}'")
+
+    # Load config:
+    config = None
+    with open(CONFIG_FILE) as f:
+        config = json.loads(f.read())
+
+    context.user_data["config"] = config
+
+    # Create and configure DB:
+    create_db_if_not_exist(config.get('db_path')) 
+    create_table_if_not_exists(config.get('db_path'))
+
+    if update.message.from_user.id not in config.get("allowed_users", []):
         return NOT_ALLOWED_USER
-    logger.info(f"Started conversation from user: '{user['first_name']}' with username '{user['username']}' and id '{user['id']}'")
-    main_types = CONFIG.get("texts").get("main_type_buttons_text")
-    # main_types.append(CONFIG.get("texts").get("others_button_text"))
+    main_types = config.get("texts").get("main_type_buttons_text")
+    main_types.append(config.get("texts").get("others_button_text"))
     buttons = [main_types, 
-              [CONFIG.get("texts").get("generate_report_button_text")]]
+              [config.get("texts").get("generate_report_button_text")]]
                 # [CANCEL_BUTTON_TEXT, callback_data="/cancel"]]
     
     # using one_time_keyboard to hide the keyboard
-    await update.message.reply_text(CONFIG.get("texts").get("start_new_expense"), 
+    await update.message.reply_text(config.get("texts").get("start_new_expense"), 
                                     reply_markup=ReplyKeyboardMarkup(buttons, one_time_keyboard=True))
+    
     return EXPENSE_TYPE
 
 
-async def receive_not_allowed_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def receive_not_allowed_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
-    Loop not allowed user
+    Filter allowed users
     """
-    user = update.message.from_user
-    logger.info(f"Not Allowed user {user['id']} message: {update.message.text} ")
-    await update.message.reply_text(CONFIG.get("texts").get("user_not_allowed"), 
+
+    config = context.user_data.get("config")
+    #TODO: This is not working properly. It filters the users but don't write the message
+    await update.message.reply_text(config.get("texts").get("user_not_allowed"), 
                                     reply_markup=ReplyKeyboardRemove())
-    return NOT_ALLOWED_USER
+    
+    return EXPENSE_TYPE
 
 
-async def receive_expense_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def receive_expense_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
     Get Expense type
     """
 
+    config = context.user_data.get("config")
+
     user = update.message.from_user
     expense_type = update.message.text.upper()
-    logger.info(f"User: {user.id}-{user.first_name} - EXPENSE_TYPE: {expense_type}")
-    # context.user_data["user"] = user.first_name.upper()
+    logger.info("EXPENSE_TYPE of %s: %s", user.first_name, expense_type)
+    context.user_data["user"] = user.first_name.upper()
     context.user_data["expense_type"] = expense_type
 
-    # main_types = CONFIG.get("texts").get("main_type_buttons_text")
-    # main_types.append(CONFIG.get("texts").get("others_button_text"))
+    main_types = config.get("texts").get("main_type_buttons_text")
+    main_types.append(config.get("texts").get("others_button_text"))
     
     message = ""
-    if CONFIG.get("texts").get("generate_report_button_text") in update.message.text:
+    if update.message.text in main_types:
+        message += config.get("texts").get("receive_expense_type_message").format(expense_type=expense_type)
+    # Generate report
+    elif config.get("texts").get("generate_report_button_text") in update.message.text:
         # TODO:  GENERATE REPORT
-        import pdb
-        pdb.set_trace()
         pass
+    # Restart
     else:
-        message += CONFIG.get("texts").get("receive_expense_type_message").format(expense_type=expense_type)
-
-    # if update.message.text in main_types:
-    #     message += CONFIG.get("texts").get("receive_expense_type_message").format(expense_type=expense_type)
-    # # Generate report
-    # elif CONFIG.get("texts").get("generate_report_button_text") in update.message.text:
-    #     # TODO:  GENERATE REPORT
-    #     pass
-    # # Restart
-    # else:
-    #     await update.message.reply_text(CONFIG.get("texts").get("restart_text"), reply_markup=ReplyKeyboardRemove())
-    #     return ConversationHandler.END
+        await update.message.reply_text(config.get("texts").get("restart_text"), reply_markup=ReplyKeyboardRemove())
+        return ConversationHandler.END
     
     await update.message.reply_text(message, reply_markup=ReplyKeyboardRemove())
 
@@ -118,11 +107,13 @@ async def receive_expense_description(update: Update, context: ContextTypes.DEFA
     Get the Expense Description
     """
 
+    config = context.user_data.get("config")
+
     user = update.message.from_user
     expense_description = update.message.text.upper()
-    logger.info(f"User: {user.id}-{user.first_name} - EXPENSE_DESCRIPTION: {expense_description}")
+    logger.info("EXPENSE_DESCRIPTION of %s: %s", user.first_name, expense_description)
     context.user_data["expense_description"] = expense_description
-    message = CONFIG.get("texts").get("receive_expense_description_message").format(expense_description=expense_description)
+    message = config.get("texts").get("receive_expense_description_message").format(expense_description=expense_description)
     await update.message.reply_text(message)
 
     return EXPENSE_AMOUNT
@@ -133,20 +124,22 @@ async def receive_expense_amount(update: Update, context: ContextTypes.DEFAULT_T
     Get the Expense Amount
     """
 
+    config = context.user_data.get("config")
+
     user = update.message.from_user
     try:
         expense_amount = float(update.message.text.replace(",", "."))
     except ValueError:
         expense_amount = 0.0
     context.user_data["expense_amount"] = expense_amount
-    logger.info(f"User: {user.id}-{user.first_name} - EXPENSE_AMOUNT: {expense_amount}")
-    buttons = [[CONFIG.get("texts").get("yes_button_text"), CONFIG.get("texts").get("no_button_text")]]
+    logger.info("EXPENSE_AMOUNT of %s: %s", user.first_name, expense_amount)
+    buttons = [[config.get("texts").get("yes_button_text"), config.get("texts").get("no_button_text")]]
 
-    message = CONFIG.get("texts").get("receive_expense_amount_message").format(expense_type=context.user_data["expense_type"],
+    message = config.get("texts").get("receive_expense_amount_message").format(expense_type=context.user_data["expense_type"],
                                                                                expense_description=context.user_data["expense_description"],
                                                                                expense_amount=expense_amount)
     await update.message.reply_text(
-        message, reply_markup=ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
+        message, reply_markup=ReplyKeyboardMarkup(buttons, one_time_keyboard=False)
     )
 
     return FINISH_GATHERING_INFO
@@ -156,17 +149,18 @@ async def receive_finish_gathering_info(update: Update, context: ContextTypes.DE
     """
     Finish Gatherinf INFO
     """
+    
+    config = context.user_data.get("config")
 
     user = update.message.from_user
-    logger.info(f"User: {user.id}-{user.first_name} - FINISH GATHERING INFO: { update.message.text}")
-
+    logger.info("FINISH GATHERING INFO of %s: %s", user.first_name, update.message.text)
     message = ""
 
-    if update.message.text == CONFIG.get("texts").get("yes_button_text"):
-        message = CONFIG.get("texts").get("receive_finish_gathering_info_message")
+    if update.message.text == config.get("texts").get("yes_button_text"):
+        message = config.get("texts").get("receive_finish_gathering_info_message")
         expense_info = {
             "date": int(date.today().strftime("%Y%m%d")),
-            "user": context.user_data.get("user").first_name,
+            "user": context.user_data["user"],
             "expense_type": context.user_data["expense_type"],
             "expense_description": context.user_data["expense_description"],
             "expense_amount": context.user_data["expense_amount"]
@@ -174,16 +168,17 @@ async def receive_finish_gathering_info(update: Update, context: ContextTypes.DE
         for k, v in expense_info.items():
             message += f" <b>{k}</b>:  {v}\n"        
         
-        insert_in_db(expense_info, DB_PATH)
+        insert_in_db(expense_info, config.get('db_path'))
+        print_table_content(config.get('db_path'))
         # TODO: GDRIVE?
         # https://towardsdatascience.com/turn-google-sheets-into-your-own-database-with-python-4aa0b4360ce7
-        if CONFIG.get("gdrive").get("active"):
+        if config.get("gdrive").get("active"):
             pass
 
     else:
         logger.info("User %s SAID NO WHEN GATHERING INFO", user.first_name)
 
-    message += CONFIG.get("texts").get("restart_text")    
+    message += config.get("texts").get("restart_text")    
     await update.message.reply_text(
         message, reply_markup=ReplyKeyboardRemove(),  parse_mode=ParseMode.HTML
     )
@@ -194,11 +189,13 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     Cancel and ends the conversation.
     """
+    
+    config = context.user_data.get("config")
 
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     await update.message.reply_text(
-        CONFIG.get("texts").get("restart_text"), reply_markup=ReplyKeyboardRemove()
+        config.get("texts").get("restart_text"), reply_markup=ReplyKeyboardRemove()
     )
     return ConversationHandler.END
 
@@ -209,14 +206,9 @@ def main() -> None:
     Based on: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot.py
     """
 
-    # Create and configure DB:
-    create_db_if_not_exist(DB_PATH) 
-    create_table_if_not_exists(DB_PATH)
-
-
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(os.environ['TG_BOT_HOUSEHOLD_EXPENSES_TOKEN']).build()
-
+    
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
