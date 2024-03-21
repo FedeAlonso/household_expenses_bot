@@ -5,7 +5,11 @@ import logging
 
 
 def create_db_if_not_exist(db_name='household_expenses.db'):
+    """
+    Create Household Expenses database
 
+    :param str db_name: path of the database file
+    """
     #Check if db not exists:
     if not Path(db_name).is_file():
         # Check if the db file should be contained in a folder that does not exist
@@ -20,7 +24,11 @@ def create_db_if_not_exist(db_name='household_expenses.db'):
 
 
 def create_table_if_not_exists(db_name='household_expenses.db'):
+    """
+    Create Expenses table
 
+    :param str db_name: path of the database file
+    """
     conn = sqlite3.connect(db_name)
     conn.execute('''CREATE TABLE IF NOT EXISTS EXPENSES
             (ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,21 +42,43 @@ def create_table_if_not_exists(db_name='household_expenses.db'):
 
 
 def insert_in_db(expense_info, db_name='household_expenses.db'):
+    """
+    Insert in table expenses
 
+    :param dict expense_info: Dictionary with the expense info
+    :param str db_name: path of the database file
+    :return: Row ID of the new row, or -1 if something went wrong
+    """
     conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
     logging.info("INSERT: Opened database successfully")
     query = f"""
         INSERT INTO EXPENSES (DATE,USER,EXPENSE_TYPE,EXPENSE_DESCRIPTION,EXPENSE_AMOUNT) 
         VALUES ({expense_info["date"]}, '{expense_info["user"]}', '{expense_info["expense_type"]}', '{expense_info["expense_description"]}', {expense_info["expense_amount"]} )
     """
     logging.info(f"INSERT: Query: {query}")
-    conn.execute(query)
+    cursor.execute(query)
     conn.commit()
-    logging.info("INSERT: Records created successfully")
+    cursor.close()
     conn.close()
+    
+    # Verify Insertion
+    if cursor.rowcount <= 0:
+        logging.warn(f"INSERT: ERROR. rowcount: {cursor.rowcount}")
+        return -1
+    logging.info(f"INSERT: Successfully. ROW ID: {cursor.lastrowid}")
+    return cursor.lastrowid
+
 
 
 def delete_from_db(expenses_list, db_name='household_expenses.db'):
+    """
+    Delete one or more rows from the table EXPENSES
+
+    :param list expenses_list: List with the IDs of the rows to delete
+    :param str db_name: path of the database file
+    :return: List with the IDs that have not been deleted
+    """
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     wrong_deletions = []
@@ -56,9 +86,11 @@ def delete_from_db(expenses_list, db_name='household_expenses.db'):
         query = f"DELETE FROM EXPENSES WHERE ID={expense}"
         cursor.execute(query)
         conn.commit()
-        affected_rows = cursor.rowcount
-        if affected_rows == 0:
+        if cursor.rowcount <= 0:
             wrong_deletions.append(expense)
+            logging.warn(f"DELETE: Expense {expense} not deleted")
+        else:
+            logging.info(f"DELETE: Expense {expense} deleted")
     cursor.close()
     conn.close()
     return wrong_deletions
@@ -66,6 +98,13 @@ def delete_from_db(expenses_list, db_name='household_expenses.db'):
 
 
 def get_table_content(db_name='household_expenses.db', limit=20):
+    """
+    Get the last <limit> rows of the table EXPENSES
+
+    :param str db_name: path of the database file
+    :param int limit: Number of rows to retrieve
+    :return: Dict of dicts with the info of those rows
+    """
     conn = sqlite3.connect(db_name)
     query = f"SELECT * FROM EXPENSES ORDER BY ID DESC LIMIT {limit}"
     logging.info(f"GET: Query: {query}")
@@ -82,15 +121,3 @@ def get_table_content(db_name='household_expenses.db', limit=20):
         logging.info(f"GET: {row[0]}  {row[1]}  {row[2]}  {row[3]}  {row[4]}  {row[5]}")
     conn.close()
     return json_content
-
-
-# def print_table_content(db_name='household_expenses.db'):
-#     conn = sqlite3.connect(db_name)
-#     query = "SELECT * FROM EXPENSES"
-#     logging.info(f"INSERT: Query: {query}")
-#     cursor = conn.execute(query)
-#     message = ""
-#     for row in cursor:
-#         message += f"{row[0]}  {row[1]}  {row[2]}  {row[3]}  {row[4]}  {row[5]}\n" 
-#     print(message)
-#     conn.close()

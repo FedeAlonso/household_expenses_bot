@@ -254,12 +254,16 @@ async def receive_finish_gathering_info(update: Update, context: ContextTypes.DE
         for k, v in expense_info.items():
             message += f" <b>{k}</b>:  {v}\n"        
         
-        insert_in_db(expense_info, DB_PATH)
+        insert_result = insert_in_db(expense_info, DB_PATH)
         
-        # TODO: GDRIVE?
-        # https://towardsdatascience.com/turn-google-sheets-into-your-own-database-with-python-4aa0b4360ce7
-        if CONFIG.get("gdrive").get("active"):
-            pass
+        #Insert goes wrong
+        if insert_result == -1:
+            message += f'<b>{CONFIG.get("texts").get("insert_result_KO")}</b>\n'
+        else:
+            # TODO: GDRIVE?
+            # https://towardsdatascience.com/turn-google-sheets-into-your-own-database-with-python-4aa0b4360ce7
+            if CONFIG.get("gdrive").get("active"):
+                pass
 
     else:
         logger.info("User %s SAID NO WHEN GATHERING INFO", user.first_name)
