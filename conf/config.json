@@ -18,12 +18,12 @@
         "start_new_expense": "Which type of expense do you want to add",
         "select_expense_to_delete": "Which expense do you want to delete? Write down the ID (multiple selection by separating the values with commas)",
         "no_expenses_to_delete": "The IDs are not numerical.",
-        "deletion_result_OK": "The following expenses were deleted successfully: {expenses}",
+        "deletion_result_OK": "The following expenses were deleted successfully: {expenses}.",
         "deletion_result_KO": "There were some errors trying to delte the following expenses: {expenses}", 
         "confirm_expenses_to_delete": "The following expenses are going to be deleted. Are you sure?",
         "receive_expense_type_message": "Expense Type: {expense_type}\nAdd a description (e.g.: store name)",
         "receive_expense_description_message": "Expense Description: {expense_description}.\nAdd the expense amount",
-        "receive_expense_amount_message": "Expense Type: {expense_type}\nExpense Description: {expense_description}\nExpense Amount: {expense_amount}\nIs it correct?",
+        "receive_expense_amount_message": "Expense Type: {expense_type}\nExpense Description: {expense_description}\nExpense Amount: {expense_amount}\nIs it OK?",
         "receive_finish_gathering_info_message": "The following information has been inserted in the database\n"
 
     },
