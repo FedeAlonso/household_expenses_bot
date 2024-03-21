@@ -1,9 +1,10 @@
 import calendar
 import time
 import gspread
+import logging
+import pandas as pd
 from datetime import date
 from oauth2client.service_account import ServiceAccountCredentials
-import pandas as pd
 
 # https://docs.gspread.org/en/latest/user-guide.html#deleting-a-worksheet
 
@@ -111,10 +112,10 @@ actual_year = date.today().strftime("%Y")
 worksheet_name = "test_0"
 wksht = get_worksheet(sht, worksheet_name)
 
-#BORRAMOS WORKSHEET Y RECREAMOS:
-wksht = sht.worksheet(worksheet_name)
-sht.del_worksheet(wksht)
-wksht = get_worksheet(sht, worksheet_name)
+# #BORRAMOS WORKSHEET Y RECREAMOS:
+# wksht = sht.worksheet(worksheet_name)
+# sht.del_worksheet(wksht)
+# wksht = get_worksheet(sht, worksheet_name)
 
 asd = [{"date":"20230101","type":"example_type","description":"example_description","amount":123.45},{"date":"20230102","type":"example_type2","description":"example_description2","amount":123.45},{"date":"20230101","type":"example_type3"}]
 

@@ -48,9 +48,26 @@ def insert_in_db(expense_info, db_name='household_expenses.db'):
     conn.close()
 
 
-def get_table_content(db_name='household_expenses.db'):
+def delete_from_db(expenses_list, db_name='household_expenses.db'):
     conn = sqlite3.connect(db_name)
-    query = "SELECT * FROM EXPENSES"
+    cursor = conn.cursor()
+    wrong_deletions = []
+    for expense in expenses_list:
+        query = f"DELETE FROM EXPENSES WHERE ID={expense}"
+        cursor.execute(query)
+        conn.commit()
+        affected_rows = cursor.rowcount
+        if affected_rows == 0:
+            wrong_deletions.append(expense)
+    cursor.close()
+    conn.close()
+    return wrong_deletions
+
+
+
+def get_table_content(db_name='household_expenses.db', limit=20):
+    conn = sqlite3.connect(db_name)
+    query = f"SELECT * FROM EXPENSES ORDER BY ID DESC LIMIT {limit}"
     logging.info(f"GET: Query: {query}")
     cursor = conn.execute(query)
     json_content = {}
@@ -64,6 +81,7 @@ def get_table_content(db_name='household_expenses.db'):
         }
         logging.info(f"GET: {row[0]}  {row[1]}  {row[2]}  {row[3]}  {row[4]}  {row[5]}")
     conn.close()
+    return json_content
 
 
 # def print_table_content(db_name='household_expenses.db'):

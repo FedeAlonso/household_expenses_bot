@@ -3,7 +3,7 @@ from logging.handlers import RotatingFileHandler
 import os
 import json
 from datetime import date
-from utils.household_expenses_db import create_db_if_not_exist, create_table_if_not_exists, insert_in_db, get_table_content
+from utils.household_expenses_db import create_db_if_not_exist, create_table_if_not_exists, insert_in_db, get_table_content, delete_from_db
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -38,7 +38,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-NOT_ALLOWED_USER, EXPENSE_TYPE, EXPENSE_DESCRIPTION, EXPENSE_AMOUNT, FINISH_GATHERING_INFO = range(5)
+NOT_ALLOWED_USER, MAIN_ACTION, EXPENSES_TO_DELETE, CONFIRM_EXPENSES_TO_DELETE, EXPENSE_TYPE, EXPENSE_DESCRIPTION, EXPENSE_AMOUNT, FINISH_GATHERING_INFO = range(8)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -51,16 +51,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         logger.info(f"Not Allowed user: '{user['first_name']}' with username '{user['username']}' and id '{user['id']}'")
         return NOT_ALLOWED_USER
     logger.info(f"Started conversation from user: '{user['first_name']}' with username '{user['username']}' and id '{user['id']}'")
-    main_types = CONFIG.get("texts").get("main_type_buttons_text")
+    main_actions = [CONFIG.get("texts").get("main_actions_add_expense"),
+                    CONFIG.get("texts").get("main_actions_delete_expense")]
     # main_types.append(CONFIG.get("texts").get("others_button_text"))
-    buttons = [main_types, 
-              [CONFIG.get("texts").get("generate_report_button_text")]]
+    buttons = [main_actions, 
+              [CONFIG.get("texts").get("main_actions_generate_report")]]
                 # [CANCEL_BUTTON_TEXT, callback_data="/cancel"]]
     
     # using one_time_keyboard to hide the keyboard
-    await update.message.reply_text(CONFIG.get("texts").get("start_new_expense"), 
+    await update.message.reply_text(CONFIG.get("texts").get("select_main_action"), 
                                     reply_markup=ReplyKeyboardMarkup(buttons, one_time_keyboard=True))
-    return EXPENSE_TYPE
+    return MAIN_ACTION
 
 
 async def receive_not_allowed_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -74,11 +75,98 @@ async def receive_not_allowed_user(update: Update, context: ContextTypes.DEFAULT
     return NOT_ALLOWED_USER
 
 
+async def receive_main_action(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Get main action
+    """
+    user = update.message.from_user
+    main_action = update.message.text
+    logger.info(f"User: {user.id}-{user.first_name} - ACTION: {main_action}")
+    if CONFIG.get("texts").get("main_actions_generate_report") == main_action:
+        #TODO: GENERATE REPORT
+        pass
+    elif CONFIG.get("texts").get("main_actions_add_expense") == main_action:
+        buttons = [CONFIG.get("texts").get("main_type_buttons_text")]
+        await update.message.reply_text(CONFIG.get("texts").get("start_new_expense"), 
+                                        reply_markup=ReplyKeyboardMarkup(buttons, 
+                                        one_time_keyboard=True))
+        return EXPENSE_TYPE
+    
+    elif CONFIG.get("texts").get("main_actions_delete_expense") == main_action:
+        last_expenses = get_table_content(DB_PATH)
+        response_message = CONFIG.get("texts").get("select_expense_to_delete")
+        for expense_id, expense_values in last_expenses.items():
+            response_message += f"""
+                <b>ID:</b> {expense_id}
+                <b>AMOUNT:</b> {expense_values.get("expense_amount","")}
+                <b>DESC.:</b> {expense_values.get("expense_description","")}
+                <b>DATE:</b> {expense_values.get("date","")}
+            """
+        await update.message.reply_text(response_message, parse_mode=ParseMode.HTML)
+        return EXPENSES_TO_DELETE
+    else: 
+        logger.warning(f"User: {user.id}-{user.first_name} - ACTION: {main_action} - NOT SUPPORTED!")
+    return ConversationHandler.END
+
+
+async def delete_expenses(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Delete expenses
+    """
+    user = update.message.from_user
+    message = update.message.text
+    logger.info(f"User: {user.id}-{user.first_name} - DELETION MESSAGE: {message}")
+    elems_to_delete = [int(x) for x in message.split(",") if x.strip().isnumeric()]
+    
+    # IF THE IDs SENT BY THE USER ARE NOT NUMERIC
+    if len(elems_to_delete) == 0:
+        logger.info(f"User: {user.id}-{user.first_name} - WRONG DELETION MESSAGE")
+        message = f'{CONFIG.get("texts").get("no_expenses_to_delete")} {CONFIG.get("texts").get("restart_text")}'
+        await update.message.reply_text(message, reply_markup=ReplyKeyboardRemove())
+        return ConversationHandler.END
+
+    elems_to_delete_str = ', '.join(str(x) for x in elems_to_delete)
+    context.user_data["elems_to_delete"] = elems_to_delete
+    context.user_data["elems_to_delete_str"] = elems_to_delete_str
+    return_message = f"""{CONFIG.get("texts").get("confirm_expenses_to_delete")}
+    {elems_to_delete_str}
+    """
+    buttons = [[CONFIG.get("texts").get("yes_button_text"), CONFIG.get("texts").get("no_button_text")]]
+    await update.message.reply_text(
+        return_message, reply_markup=ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
+    )
+    return CONFIRM_EXPENSES_TO_DELETE
+
+
+async def confirm_delete_expenses(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Confirm expenses deletion
+    """
+    user = update.message.from_user
+    logger.info(f"User: {user.id}-{user.first_name} - CONFIRM DELETE EXPENSES: { update.message.text}")
+
+    message = ""
+
+    if update.message.text == CONFIG.get("texts").get("yes_button_text"):
+        deletion_result = delete_from_db(context.user_data.get("elems_to_delete"), DB_PATH)
+        # TODO: GDRIVE?
+        if CONFIG.get("gdrive").get("active"):
+            pass
+        if len(deletion_result) == 0:
+            message +=  CONFIG.get("texts").get("deletion_result_OK").format(expenses=(context.user_data.get("elems_to_delete_str")))
+        else:
+            expenses_not_deleted = ', '.join(str(x) for x in deletion_result)
+            message +=  CONFIG.get("texts").get("deletion_result_KO").format(expenses=expenses_not_deleted)
+
+    message +=  CONFIG.get("texts").get("restart_text")
+    await update.message.reply_text(message, reply_markup=ReplyKeyboardRemove())
+    return ConversationHandler.END
+
+
 async def receive_expense_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     Get Expense type
     """
-
     user = update.message.from_user
     expense_type = update.message.text.upper()
     logger.info(f"User: {user.id}-{user.first_name} - EXPENSE_TYPE: {expense_type}")
@@ -89,7 +177,7 @@ async def receive_expense_type(update: Update, context: ContextTypes.DEFAULT_TYP
     # main_types.append(CONFIG.get("texts").get("others_button_text"))
     
     message = ""
-    if CONFIG.get("texts").get("generate_report_button_text") in update.message.text:
+    if CONFIG.get("texts").get("main_actions_generate_report") in update.message.text:
         # TODO:  GENERATE REPORT
         import pdb
         pdb.set_trace()
@@ -100,7 +188,7 @@ async def receive_expense_type(update: Update, context: ContextTypes.DEFAULT_TYP
     # if update.message.text in main_types:
     #     message += CONFIG.get("texts").get("receive_expense_type_message").format(expense_type=expense_type)
     # # Generate report
-    # elif CONFIG.get("texts").get("generate_report_button_text") in update.message.text:
+    # elif CONFIG.get("texts").get("main_actions_generate_report") in update.message.text:
     #     # TODO:  GENERATE REPORT
     #     pass
     # # Restart
@@ -213,7 +301,6 @@ def main() -> None:
     create_db_if_not_exist(DB_PATH) 
     create_table_if_not_exists(DB_PATH)
 
-
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(os.environ['TG_BOT_HOUSEHOLD_EXPENSES_TOKEN']).build()
 
@@ -221,6 +308,9 @@ def main() -> None:
         entry_points=[CommandHandler("start", start)],
         states={
             NOT_ALLOWED_USER:[MessageHandler(filters.TEXT & ~filters.COMMAND, receive_not_allowed_user)],
+            MAIN_ACTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_main_action)],
+            EXPENSES_TO_DELETE: [MessageHandler(filters.TEXT & ~filters.COMMAND, delete_expenses)],
+            CONFIRM_EXPENSES_TO_DELETE: [MessageHandler(filters.TEXT & ~filters.COMMAND, confirm_delete_expenses)],
             EXPENSE_TYPE: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_expense_type)],
             EXPENSE_DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_expense_description)],
             EXPENSE_AMOUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_expense_amount)],
