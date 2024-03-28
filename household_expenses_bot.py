@@ -4,6 +4,7 @@ import os
 import json
 from datetime import date
 from utils.household_expenses_db import create_db_if_not_exist, create_table_if_not_exists, insert_in_db, get_table_content, delete_from_db
+from utils.gdrive import insert_in_sheet, delete_from_sheet
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -156,13 +157,14 @@ async def confirm_delete_expenses(update: Update, context: ContextTypes.DEFAULT_
     if update.message.text == CONFIG.get("texts").get("yes_button_text"):
         deletion_result = delete_from_db(context.user_data.get("elems_to_delete"), DB_PATH)
         
-        # TODO: GDRIVE?
-        if CONFIG.get("gdrive").get("active"):
-            pass
         
         # If there are no errors during the deletion
         if len(deletion_result) == 0:
             message +=  CONFIG.get("texts").get("deletion_result_OK").format(expenses=(context.user_data.get("elems_to_delete_str")))
+
+            # GDRIVE: delete from sheet
+            if CONFIG.get("gdrive").get("active"):
+                delete_from_sheet(context.user_data.get("elems_to_delete"), CONFIG.get("gdrive"))
         
         # If there are errors
         else:
@@ -245,7 +247,7 @@ async def receive_finish_gathering_info(update: Update, context: ContextTypes.DE
     if update.message.text == CONFIG.get("texts").get("yes_button_text"):
         message = CONFIG.get("texts").get("receive_finish_gathering_info_message")
         expense_info = {
-            "date": int(date.today().strftime("%Y%m%d")),
+            "date": date.today().strftime("%Y%m%d"),
             "user": context.user_data.get("user").first_name,
             "expense_type": context.user_data["expense_type"],
             "expense_description": context.user_data["expense_description"],
@@ -259,11 +261,11 @@ async def receive_finish_gathering_info(update: Update, context: ContextTypes.DE
         #Insert goes wrong
         if insert_result == -1:
             message += f'<b>{CONFIG.get("texts").get("insert_result_KO")}</b>\n'
-        else:
-            # TODO: GDRIVE?
-            # https://towardsdatascience.com/turn-google-sheets-into-your-own-database-with-python-4aa0b4360ce7
-            if CONFIG.get("gdrive").get("active"):
-                pass
+        # GDRIVE: Add to sheet    
+        elif CONFIG.get("gdrive").get("active"):
+            expense_info["id"] = insert_result
+            insert_in_sheet(expense_info, CONFIG.get("gdrive"))
+            #TODO: Gestionar esto
 
     else:
         logger.info("User %s SAID NO WHEN GATHERING INFO", user.first_name)

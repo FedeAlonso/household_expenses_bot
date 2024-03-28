@@ -31,8 +31,9 @@
     "gdrive": {
         "active": true,
         "credentials_file": "conf/gdrive_credentials.json",
-        "sheet_name": "household_expenses",
-        "share_mails": ["fede488@gmail.com", "celia.moya88@gmail.com"],
+        "sheet_name": "household_expenses_test_3",
+        "old_share_mails": ["fede488@gmail.com", "celia.moya88@gmail.com"],
+        "share_mails": ["fede488@gmail.com"],
         "write_request_quota": 60
     }
 }
