@@ -2,9 +2,14 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import json
-from datetime import date
+
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+
+from datetime import datetime
 from utils.household_expenses_db import create_db_if_not_exist, create_table_if_not_exists, insert_in_db, get_table_content, delete_from_db
 from utils.gdrive import insert_in_sheet, delete_from_sheet
+from utils.report import create_report
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -23,7 +28,11 @@ with open(CONFIG_FILE) as f:
     CONFIG = json.loads(f.read())
 
 if not os.path.exists(CONFIG.get("output_folder")):
-    os.makedirs(CONFIG.get("output_folder"))    
+    os.makedirs(CONFIG.get("output_folder"))
+    
+REPORTS_FOLDER = os.path.join(os.path.join(CONFIG.get("output_folder"),"reports"))
+if not os.path.exists(REPORTS_FOLDER):
+    os.makedirs(REPORTS_FOLDER)
 
 DB_PATH = os.path.join(CONFIG.get("output_folder"), CONFIG.get("db_filename"))    
 
@@ -87,7 +96,19 @@ async def receive_main_action(update: Update, context: ContextTypes.DEFAULT_TYPE
     # Generate report
     if CONFIG.get("texts").get("main_actions_generate_report") == main_action:
         #TODO: GENERATE REPORT
-        pass
+        # pass
+        report_name = datetime.now().strftime(f"%Y%m%d-EXPENSES REPORT-{user.id}-%H%M%S.pdf")
+        report_path = os.path.join(REPORTS_FOLDER, report_name)
+        report_file = create_report(report_path, get_table_content(DB_PATH, limit=0))
+        # w, h = A4
+        # c = canvas.Canvas(report, pagesize=A4)
+        # c.drawString(50, h - 50, "Hello, world!")
+        # c.showPage()
+        # c.save()
+        document = open(report_path, 'rb')
+        await update.message.reply_document(document)
+        await update.message.reply_text(CONFIG.get("texts").get("restart_text"), reply_markup=ReplyKeyboardRemove())
+        return ConversationHandler.END
 
     # Add new expense
     elif CONFIG.get("texts").get("main_actions_add_expense") == main_action:
@@ -99,7 +120,7 @@ async def receive_main_action(update: Update, context: ContextTypes.DEFAULT_TYPE
     
     # Delete expense
     elif CONFIG.get("texts").get("main_actions_delete_expense") == main_action:
-        last_expenses = get_table_content(DB_PATH)
+        last_expenses = get_table_content(DB_PATH, limit=5)
         response_message = CONFIG.get("texts").get("select_expense_to_delete")
         for expense_id, expense_values in last_expenses.items():
             response_message += f"""
@@ -247,7 +268,7 @@ async def receive_finish_gathering_info(update: Update, context: ContextTypes.DE
     if update.message.text == CONFIG.get("texts").get("yes_button_text"):
         message = CONFIG.get("texts").get("receive_finish_gathering_info_message")
         expense_info = {
-            "date": date.today().strftime("%Y%m%d"),
+            "date": datetime.today().strftime("%Y%m%d"),
             "user": context.user_data.get("user").first_name,
             "expense_type": context.user_data["expense_type"],
             "expense_description": context.user_data["expense_description"],

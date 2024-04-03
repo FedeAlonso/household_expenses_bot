@@ -106,7 +106,9 @@ def get_table_content(db_name='household_expenses.db', limit=20):
     :return: Dict of dicts with the info of those rows
     """
     conn = sqlite3.connect(db_name)
-    query = f"SELECT * FROM EXPENSES ORDER BY ID DESC LIMIT {limit}"
+    query = f"SELECT * FROM EXPENSES ORDER BY ID DESC"
+    if limit > 0:
+        query += f" LIMIT {limit}"
     logging.info(f"GET: Query: {query}")
     cursor = conn.execute(query)
     json_content = {}
