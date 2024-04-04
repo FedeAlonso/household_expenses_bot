@@ -1,11 +1,7 @@
 import logging
-from logging.handlers import RotatingFileHandler
 import os
 import json
-
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-
+from logging.handlers import RotatingFileHandler
 from datetime import datetime
 from utils.household_expenses_db import create_db_if_not_exist, create_table_if_not_exists, insert_in_db, get_table_content, delete_from_db
 from utils.gdrive import insert_in_sheet, delete_from_sheet
@@ -99,12 +95,7 @@ async def receive_main_action(update: Update, context: ContextTypes.DEFAULT_TYPE
         # pass
         report_name = datetime.now().strftime(f"%Y%m%d-EXPENSES REPORT-{user.id}-%H%M%S.pdf")
         report_path = os.path.join(REPORTS_FOLDER, report_name)
-        report_file = create_report(report_path, get_table_content(DB_PATH, limit=0))
-        # w, h = A4
-        # c = canvas.Canvas(report, pagesize=A4)
-        # c.drawString(50, h - 50, "Hello, world!")
-        # c.showPage()
-        # c.save()
+        create_report(report_path, get_table_content(DB_PATH, limit=0))
         document = open(report_path, 'rb')
         await update.message.reply_document(document)
         await update.message.reply_text(CONFIG.get("texts").get("restart_text"), reply_markup=ReplyKeyboardRemove())

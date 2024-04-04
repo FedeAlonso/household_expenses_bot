@@ -2,9 +2,9 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, PageBreak, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.graphics.shapes import Drawing, String
+from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.piecharts import Pie
-from reportlab.graphics.charts.barcharts import VerticalBarChart, HorizontalBarChart
+from reportlab.graphics.charts.barcharts import HorizontalBarChart
 from datetime import date
 from math import ceil
 
@@ -20,6 +20,28 @@ TABLE_STYLE = [('BACKGROUND', (0, 0), (-1, 0), colors.grey),
 
 
 def create_report(filename, expenses):
+    """
+    Create a PDF expenses Report
+    
+    :param str filename: Report file path
+    :param dict expenses: Dict of expenses dicts. e.g.:
+    {
+        2: {
+            'date': 20200102,
+            'user': 'user2',
+            'expense_type': 'TYPE_2',
+            'expense_description': 'DESCRIPTION 2',
+            'expense_amount': 21.0
+        },
+        1: {
+            'date': 20200101,
+            'user': 'user1',
+            'expense_type': 'TYPE_1',
+            'expense_description': 'DESCRIPTION 1',
+            'expense_amount': 12.0
+        }
+    }
+    """
     
     bar_chart_expense = []
     bar_chart_date = []
@@ -125,6 +147,22 @@ def create_report(filename, expenses):
 
 
 def create_table(expenses_dict, table_headers=EXPENSES_TABLE_HEADERS):
+    """
+    Create table rows from the expenses dict
+    
+    :param str filename: Report file path
+    :param dict expenses: Dict of expenses dicts
+    :return dict return_dict: Dict with the table rows and the total amount. e.g.:
+    {
+        'table': [
+            ['ID', 'Date', 'Type', 'Description', 'Amount'], # Table Headers
+            [2, 20200102, 'TYPE_2','DESCRIPTION 2', 21.0 ],
+            [1, 20200101, 'TYPE_1','DESCRIPTION 1'', 12.0 ]
+        ],
+        'total_amount': 33.0
+    }
+    """    
+ 
     # Create one total expenses table per month
     return_dict = {'table': [table_headers], 'total_amount': 0.0}
     for key, value in expenses_dict.items():
@@ -133,140 +171,7 @@ def create_table(expenses_dict, table_headers=EXPENSES_TABLE_HEADERS):
                    value.get('expense_type'),
                    # Limit the description to 15 chars
                    value.get('expense_description')[:15],
-                   value.get('expense_amount')]
+                   round(value.get('expense_amount'), 2)]
         return_dict['table'].append(expense)
         return_dict['total_amount'] += value.get('expense_amount')
     return return_dict
-
-
-# expenses = {
-#     20: {
-#         'date': 20240328,
-#         'user': 'Nook',
-#         'expense_type': 'OTROS',
-#         'expense_description': 'SSSAAA',
-#         'expense_amount': 211.0
-#     },
-#     19: {
-#         'date': 20240328,
-#         'user': 'Nook',
-#         'expense_type': 'YOLI',
-#         'expense_description': 'YOLIPOLI2',
-#         'expense_amount': 122.0
-#     },
-#     18: {
-#         'date': 20240328,
-#         'user': 'Nook',
-#         'expense_type': 'YOLI',
-#         'expense_description': 'YOLIPOLI',
-#         'expense_amount': 12.0
-#     },
-#     17: {
-#         'date': 20240328,
-#         'user': 'Nook',
-#         'expense_type': 'YOLI',
-#         'expense_description': 'MES MARZO',
-#         'expense_amount': 23.0
-#     },
-#     16: {
-#         'date': 20240323,
-#         'user': 'Nook',
-#         'expense_type': 'ALIMENTACION',
-#         'expense_description': 'CARREFOUR',
-#         'expense_amount': 34.4
-#     },
-#     15: {
-#         'date': 20240321,
-#         'user': 'Nook',
-#         'expense_type': 'OTROS',
-#         'expense_description': 'PETRONOR',
-#         'expense_amount': 22.11
-#     },
-#     13: {
-#         'date': 20240321,
-#         'user': 'Nook',
-#         'expense_type': 'CASA FIJOS',
-#         'expense_description': 'LUZ',
-#         'expense_amount': 22.33
-#     },
-#     11: {
-#         'date': 20240321,
-#         'user': 'Nook',
-#         'expense_type': 'OTROS',
-#         'expense_description': 'REPSOL',
-#         'expense_amount': 221.0
-#     },
-#     10: {
-#         'date': 20240321,
-#         'user': 'Nook',
-#         'expense_type': 'YOLI',
-#         'expense_description': 'MES MARZO',
-#         'expense_amount': 132.0
-#     },
-#     9: {
-#         'date': 20240321,
-#         'user': 'Nook',
-#         'expense_type': 'CASA FIJOS',
-#         'expense_description': 'LUZ',
-#         'expense_amount': 22.11
-#     },
-#     8: {
-#         'date': 20240321,
-#         'user': 'Nook',
-#         'expense_type': 'ALIMENTACION',
-#         'expense_description': 'DIA',
-#         'expense_amount': 123.22
-#     },
-#     7: {
-#         'date': 20240320,
-#         'user': 'Nook',
-#         'expense_type': 'ALIMENTACION',
-#         'expense_description': 'CARREFUL',
-#         'expense_amount': 123.32
-#     },
-#     6: {
-#         'date': 20240320,
-#         'user': 'Nook',
-#         'expense_type': 'ALIMENTACION',
-#         'expense_description': 'AAA',
-#         'expense_amount': 222.2
-#     },
-#     5: {
-#         'date': 20240320,
-#         'user': 'Nook',
-#         'expense_type': 'YOLI',
-#         'expense_description': 'MES MARZO',
-#         'expense_amount': 123.222222
-#     },
-#     4: {
-#         'date': 20240220,
-#         'user': 'Nook',
-#         'expense_type': 'ALIMENTACION',
-#         'expense_description': 'AAA',
-#         'expense_amount': 222.2
-#     },
-#     3: {
-#         'date': 20240220,
-#         'user': 'Nook',
-#         'expense_type': 'YOLI',
-#         'expense_description': 'MES MARZO',
-#         'expense_amount': 123.222222
-#     },
-#     2: {
-#         'date': 20240120,
-#         'user': 'Nook',
-#         'expense_type': 'ALIMENTACION',
-#         'expense_description': 'AAA',
-#         'expense_amount': 222.2
-#     },
-#     1: {
-#         'date': 20240120,
-#         'user': 'Nook',
-#         'expense_type': 'YOLI',
-#         'expense_description': 'MES MARZO',
-#         'expense_amount': 123.222222
-#     }
-# }
-
-# filename = '_output/reports/20240401-EXPENSES REPORT-183302873-154741.pdf'
-# create_report(filename, expenses)
