@@ -42,13 +42,10 @@ def create_report(filename, expenses):
         }
     }
     """
-    
     bar_chart_expense = []
     bar_chart_date = []
     # Get different expense_types
     expense_types = set()
-    # Filtering by month and year
-    month_year = []
     
     # Create a new dict sorting the expenses by month
     month_dict = {}
@@ -162,7 +159,6 @@ def create_table(expenses_dict, table_headers=EXPENSES_TABLE_HEADERS):
         'total_amount': 33.0
     }
     """    
- 
     # Create one total expenses table per month
     return_dict = {'table': [table_headers], 'total_amount': 0.0}
     for key, value in expenses_dict.items():

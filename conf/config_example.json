@@ -2,7 +2,7 @@
     "output_folder": "_output",
     "log_filename": "household_expenses.log",
     "db_filename": "household_expenses.db",
-    "allowed_users": [183302873, 1132615347],
+    "allowed_users": [00001, 00002],
     "texts": {
         "user_not_allowed": "Sorry but you are not allowed to use this bot.\nPlease contact the admin.",
         "main_actions_add_expense": "ADD EXPENSE",
@@ -29,10 +29,10 @@
 
     },
     "gdrive": {
-        "active": true,
+        "active": false,
         "credentials_file": "conf/gdrive_credentials.json",
         "sheet_name": "household_expenses_sheet",
-        "share_mails": ["fede488@gmail.com", "celia.moya88@gmail.com"],
+        "share_mails": ["mail1@gmail.com", "mail2@gmail.com"],
         "write_request_quota": 60
     }
 }

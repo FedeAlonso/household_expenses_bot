@@ -131,3 +131,4 @@ dmypy.json
 # Project related
 _output
 conf/gdrive_credentials.json
+conf/config.json

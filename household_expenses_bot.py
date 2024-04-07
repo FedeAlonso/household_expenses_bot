@@ -91,8 +91,6 @@ async def receive_main_action(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     # Generate report
     if CONFIG.get("texts").get("main_actions_generate_report") == main_action:
-        #TODO: GENERATE REPORT
-        # pass
         report_name = datetime.now().strftime(f"%Y%m%d-EXPENSES REPORT-{user.id}-%H%M%S.pdf")
         report_path = os.path.join(REPORTS_FOLDER, report_name)
         create_report(report_path, get_table_content(DB_PATH, limit=0))
@@ -168,7 +166,6 @@ async def confirm_delete_expenses(update: Update, context: ContextTypes.DEFAULT_
 
     if update.message.text == CONFIG.get("texts").get("yes_button_text"):
         deletion_result = delete_from_db(context.user_data.get("elems_to_delete"), DB_PATH)
-        
         
         # If there are no errors during the deletion
         if len(deletion_result) == 0:
