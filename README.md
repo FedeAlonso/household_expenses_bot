@@ -24,7 +24,7 @@ That’s why.
 ```sh
 export TG_BOT_HOUSEHOLD_EXPENSES_TOKEN="your_telegram_token"
 ```
-2. Set the values in the config file (more info in the Readme inside the "config" folder)
+2. Set the values in the config file (more info in the [Config Readme])
 3. Install Python dependencies (use of [virtualenvs] is highly recommended)
 ```sh
 $ pip install -r requirements.txt
@@ -43,3 +43,4 @@ If you wouldn’t touch the report generation with someone else’s finger, or y
 [//]: # 
    [Create a Telegram bot]: <https://telegram.me/BotFather>
    [virtualenvs]: <https://virtualenv.pypa.io/en/latest/>
+   [Config Readme]: <https://github.com/FedeAlonso/household_expenses_bot/blob/main/conf/README.md>
