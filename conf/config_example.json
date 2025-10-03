@@ -32,7 +32,6 @@
         "active": false,
         "credentials_file": "conf/gdrive_credentials.json",
         "sheet_name": "household_expenses_sheet",
-        "share_mails": ["mail1@gmail.com", "mail2@gmail.com"],
-        "write_request_quota": 60
+        "share_mails": ["mail1@gmail.com", "mail2@gmail.com"]
     }
 }
