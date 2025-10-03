@@ -145,3 +145,11 @@ def update_values(wksht, row, column, new_values=[]):
         print("GDRIVE: Quota error detected. Sleeping a few seconds")
         time.sleep(10)
         wksht.update(range_name=a1_range, values=[new_values])
+
+
+# Connect to Google Sheets
+scope = ['https://www.googleapis.com/auth/spreadsheets',
+         "https://www.googleapis.com/auth/drive"]
+
+credentials = ServiceAccountCredentials.from_json_keyfile_name("conf/gdrive_credentials.json", scope)
+client = gspread.authorize(credentials)
