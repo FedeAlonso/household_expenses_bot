@@ -58,6 +58,7 @@ Rename the "config_example.json" to "config.json".
 - _gdrive -> share_mails_: Google users which will have access to the shared sheet
 
 ## gdrive_credentials.json
+**_gdrive -> active_ should be set to true**
 Rename the "gdrive_credentials_example.json" file to "gdrive_credentials.json".
 
 Here comes the tricky part. We need to create a Service Account in Google Cloud:
