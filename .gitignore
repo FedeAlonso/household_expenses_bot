@@ -132,3 +132,4 @@ dmypy.json
 _output
 conf/gdrive_credentials.json
 conf/config.json
+conf/gdrive_credentials.json
