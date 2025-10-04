@@ -33,6 +33,36 @@ $ pip install -r requirements.txt
 ```sh
 $ python household_expenses_bot.py
 ```
+
+## Flow
+The basic Telegram Commands are:
+```
+/start   #Start process 
+/cancel  #Cancel process
+```
+
+```mermaid
+flowchart TD
+    A -->|user is NOT allowed| A
+    A[start] -->|user is allowed| B[Select Action]
+    B --> C{ADD EXPENSE}
+    B --> D{DELETE EXPENSE}
+    B --> E{CREATE REPORT}
+    E --> F[Report generated]
+    D --> G{Select which ones to delete}
+    G --> H[Expenses deleted]
+    C --> I{Select Expense Type}
+    I --> J{Input Expense Description}
+    J --> K{Input Expense Amount}
+    K --> L{Confirm Expense Info}
+    L --> |No| A
+    L --> |Yes|M[Expense inserted in DB]
+    M --> |GDrive NOT Configured|A
+    M --> |GDrive Configured|N[Expense inserted in Google Sheet]
+    N --> A
+```
+ 
+
 ## Contribute
 Yes, please!
 
