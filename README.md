@@ -61,7 +61,11 @@ flowchart TD
     M --> |GDrive Configured|N[Expense inserted in Google Sheet]
     N --> A
 ```
- 
+
+## Demo
+
+[![Demo thumbnail](https://img.youtube.com/vi/JL2d0Yhbewo/0.jpg)](https://www.youtube.com/watch?v=JL2d0Yhbewo)
+
 
 ## Contribute
 Yes, please!
